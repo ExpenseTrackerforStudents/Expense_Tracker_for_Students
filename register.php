@@ -17,13 +17,13 @@ if(isset($_POST['register'])){
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    // CHECK IF EMPTY
+    // CHECK EMPTY
     if(empty($name) || empty($email) || empty($password)){
         $message = "Please fill in all fields.";
     }
     else {
 
-        // CHECK IF EMAIL ALREADY EXISTS (PREPARED STATEMENT)
+        // CHECK EMAIL EXISTS
         $stmt = $conn->prepare("SELECT user_id FROM users WHERE email=?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -31,25 +31,27 @@ if(isset($_POST['register'])){
 
         if($result->num_rows > 0){
             $message = "Email already exists!";
+            $stmt->close();
         }
         else {
 
             // HASH PASSWORD
-            $password = md5($password);
+            $hashedPassword = md5($password);
 
-            // INSERT USER (PREPARED STATEMENT)
-            $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $name, $email, $password);
+            // INSERT USER
+            $insert = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+            $insert->bind_param("sss", $name, $email, $hashedPassword);
 
-            if($stmt->execute()){
+            if($insert->execute()){
                 $message = "Registered successfully! You can now login.";
             } else {
                 $message = "Error in registration.";
             }
 
-            $stmt->close();
+            $insert->close();
         }
 
+        // CLOSE ONLY ONCE SAFELY
         $stmt->close();
     }
 }
@@ -115,7 +117,6 @@ if(isset($_POST['register'])){
 
 <h2>Register</h2>
 
-<!-- MESSAGE -->
 <?php if($message != ""){ ?>
     <p class="msg"><?php echo $message; ?></p>
 <?php } ?>
