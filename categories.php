@@ -7,6 +7,8 @@ if(!isset($_SESSION['user_id'])){
     exit();
 }
 
+$user_id = $_SESSION['user_id'];
+
 // ADD CATEGORY
 if(isset($_POST['add'])){
 
@@ -14,22 +16,35 @@ if(isset($_POST['add'])){
 
     if(!empty($category)){
 
-        mysqli_query($conn,
-        "INSERT INTO categories(category_name)
-        VALUES('$category')");
+        // CHECK IF CATEGORY ALREADY EXISTS (PER USER)
+        $check = $conn->prepare("SELECT * FROM categories WHERE category_name=?");
+        $check->bind_param("s", $category);
+        $check->execute();
+        $result = $check->get_result();
 
-        header("Location: categories.php");
-        exit();
+        if($result->num_rows == 0){
+
+            // INSERT CATEGORY (PREPARED STATEMENT)
+            $stmt = $conn->prepare("INSERT INTO categories (category_name) VALUES (?)");
+            $stmt->bind_param("s", $category);
+            $stmt->execute();
+            $stmt->close();
+        }
     }
+
+    header("Location: categories.php");
+    exit();
 }
 
-// DELETE CATEGORY
+// DELETE CATEGORY (SECURE)
 if(isset($_GET['delete'])){
 
     $id = $_GET['delete'];
 
-    mysqli_query($conn,
-    "DELETE FROM categories WHERE category_id='$id'");
+    $stmt = $conn->prepare("DELETE FROM categories WHERE category_id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
 
     header("Location: categories.php");
     exit();
@@ -120,7 +135,6 @@ if(isset($_GET['delete'])){
 </tr>
 
 <?php
-
 $result = mysqli_query($conn, "SELECT * FROM categories");
 
 while($row = mysqli_fetch_array($result)){
