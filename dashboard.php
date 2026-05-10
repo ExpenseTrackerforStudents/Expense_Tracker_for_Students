@@ -9,9 +9,7 @@ if(!isset($_SESSION['user_id'])){
 
 $user_id = $_SESSION['user_id'];
 
-/* =========================
-   TOTAL EXPENSES
-========================= */
+/* TOTAL EXPENSES */
 $totalQuery = mysqli_query($conn,"
 SELECT SUM(amount) as total
 FROM expenses
@@ -21,9 +19,7 @@ WHERE user_id='$user_id'
 $totalRow = mysqli_fetch_assoc($totalQuery);
 $total = $totalRow['total'];
 
-/* =========================
-   CHART DATA (SQL JOIN + GROUP BY)
-========================= */
+/* CHART DATA */
 $chartQuery = mysqli_query($conn,"
 SELECT categories.category_name, SUM(expenses.amount) as total
 FROM expenses
@@ -47,7 +43,6 @@ while($c = mysqli_fetch_array($chartQuery)){
 <head>
     <title>Dashboard</title>
 
-    <!-- CHART.JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -100,11 +95,21 @@ while($c = mysqli_fetch_array($chartQuery)){
         .edit{ background: green; }
         .delete{ background: red; }
 
-        canvas{
+        /* =========================
+           FIXED CHART CONTAINER
+        ========================= */
+        .chart-box{
+            width: 420px;
+            margin: 20px auto;
             background: white;
-            padding: 10px;
-            margin-top: 20px;
+            padding: 15px;
             border-radius: 10px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        }
+
+        canvas{
+            width: 100% !important;
+            height: 300px !important;
         }
     </style>
 
@@ -115,7 +120,6 @@ while($c = mysqli_fetch_array($chartQuery)){
 
 <h2>Welcome, <?php echo $_SESSION['name']; ?></h2>
 
-<!-- TOTAL + ACTIONS -->
 <div class="top-box">
     <h3>Total Expenses: ₱<?php echo $total ? $total : 0; ?></h3>
 
@@ -126,7 +130,10 @@ while($c = mysqli_fetch_array($chartQuery)){
 
 <!-- CHART -->
 <h3>Expense Chart</h3>
-<canvas id="expenseChart"></canvas>
+
+<div class="chart-box">
+    <canvas id="expenseChart"></canvas>
+</div>
 
 <script>
 const ctx = document.getElementById('expenseChart');
@@ -139,6 +146,9 @@ new Chart(ctx, {
             label: 'Expenses',
             data: <?php echo json_encode($values); ?>
         }]
+    },
+    options: {
+        maintainAspectRatio: false
     }
 });
 </script>
@@ -157,7 +167,6 @@ new Chart(ctx, {
 </tr>
 
 <?php
-
 $query = mysqli_query($conn,"
 SELECT expenses.*, categories.category_name
 FROM expenses

@@ -69,6 +69,7 @@ form{
     box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
 }
 
+/* INPUT FIELDS */
 input, select{
     width: 100%;
     padding: 10px;
@@ -130,19 +131,38 @@ th{
     margin: 10px 0;
 }
 
-/* CHART */
-canvas{
+/* =========================
+   CHART FIX (IMPORTANT UPDATE)
+========================= */
+
+/* Chart container fix */
+.chart-box{
+    width: 420px;
+    margin: 20px auto;
     background: white;
-    padding: 10px;
+    padding: 15px;
     border-radius: 10px;
-    margin-top: 20px;
     box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
 }
 
-/* SMALL RESPONSIVENESS IMPROVEMENT */
-@media (max-width: 600px){
+/* Force chart size */
+canvas{
+    width: 100% !important;
+    height: 300px !important;
+    background: transparent;
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+@media (max-width: 768px){
     .container{
         width: 95%;
+    }
+
+    .chart-box{
+        width: 100%;
     }
 
     table, th, td{
