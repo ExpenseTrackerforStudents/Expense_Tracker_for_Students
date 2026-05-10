@@ -1,0 +1,127 @@
+/* GENERAL RESET */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* BODY */
+body{
+    background: #f4f4f4;
+}
+
+/* CONTAINER */
+.container{
+    width: 90%;
+    margin: auto;
+    padding: 20px;
+}
+
+/* HEADINGS */
+h1, h2, h3{
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* LINKS */
+a{
+    text-decoration: none;
+    color: blue;
+}
+
+a:hover{
+    text-decoration: underline;
+}
+
+/* BUTTONS */
+button, .btn{
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    color: white;
+}
+
+.btn-primary{
+    background: blue;
+}
+
+.btn-success{
+    background: green;
+}
+
+.btn-danger{
+    background: red;
+}
+
+/* FORM STYLING */
+form{
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+input, select{
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+}
+
+/* TABLE */
+table{
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin-top: 20px;
+}
+
+th, td{
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+th{
+    background: #333;
+    color: white;
+}
+
+/* DASHBOARD TOP BOX */
+.top-box{
+    background: white;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 10px;
+}
+
+/* LOGIN / REGISTER BOX */
+.auth-box{
+    width: 320px;
+    margin: 100px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+}
+
+/* ERROR / SUCCESS MESSAGE */
+.error{
+    color: red;
+    margin: 10px 0;
+}
+
+.success{
+    color: green;
+    margin: 10px 0;
+}
+
+/* CHART CONTAINER */
+canvas{
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
