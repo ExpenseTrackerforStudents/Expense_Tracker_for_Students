@@ -13,20 +13,25 @@ $error = "";
 if(isset($_POST['login'])){
 
     $email = trim($_POST['email']);
-    $password = md5(trim($_POST['password']));
+    $password = trim($_POST['password']);
 
     if(empty($email) || empty($password)){
         $error = "Please fill in all fields.";
     } else {
 
-        $query = mysqli_query($conn,
-        "SELECT * FROM users
-        WHERE email='$email'
-        AND password='$password'");
+        // HASH PASSWORD (same as database storage)
+        $password = md5($password);
 
-        if(mysqli_num_rows($query) > 0){
+        // PREPARED STATEMENT (SECURE VERSION)
+        $stmt = $conn->prepare("SELECT user_id, name FROM users WHERE email=? AND password=?");
+        $stmt->bind_param("ss", $email, $password);
+        $stmt->execute();
 
-            $row = mysqli_fetch_assoc($query);
+        $result = $stmt->get_result();
+
+        if($result->num_rows > 0){
+
+            $row = $result->fetch_assoc();
 
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['name'] = $row['name'];
@@ -37,6 +42,8 @@ if(isset($_POST['login'])){
         } else {
             $error = "Invalid Email or Password!";
         }
+
+        $stmt->close();
     }
 }
 ?>
@@ -59,6 +66,7 @@ if(isset($_POST['login'])){
             padding: 20px;
             border-radius: 10px;
             text-align: center;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
         }
 
         input{
@@ -74,10 +82,16 @@ if(isset($_POST['login'])){
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover{
+            background: darkblue;
         }
 
         .error{
             color: red;
+            margin-bottom: 10px;
         }
 
         a{
@@ -100,11 +114,11 @@ if(isset($_POST['login'])){
 
 <form method="POST">
 
-<input type="email" name="email" placeholder="Email" required>
+    <input type="email" name="email" placeholder="Email" required>
 
-<input type="password" name="password" placeholder="Password" required>
+    <input type="password" name="password" placeholder="Password" required>
 
-<button type="submit" name="login">Login</button>
+    <button type="submit" name="login">Login</button>
 
 </form>
 

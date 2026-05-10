@@ -5,7 +5,38 @@ if(session_status() === PHP_SESSION_NONE){
     session_start();
 }
 
-// CLEAR ALL SESSION DATA
+// CLEAR ALL SESSION DAT<?php
+
+// START SESSION SAFELY
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// CLEAR SESSION DATA
+$_SESSION = array();
+
+// DESTROY SESSION
+session_destroy();
+
+// CLEAR SESSION COOKIE (extra security)
+if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(
+        session_name(),
+        '',
+        time() - 42000,
+        $params["path"],
+        $params["domain"],
+        $params["secure"],
+        $params["httponly"]
+    );
+}
+
+// REDIRECT TO LOGIN PAGE
+header("Location: login.php");
+exit();
+
+?>
 $_SESSION = array();
 
 // DESTROY SESSION

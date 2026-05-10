@@ -15,7 +15,7 @@ if(isset($_POST['register'])){
 
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
-    $password = md5(trim($_POST['password']));
+    $password = trim($_POST['password']);
 
     // CHECK IF EMPTY
     if(empty($name) || empty($email) || empty($password)){
@@ -23,25 +23,34 @@ if(isset($_POST['register'])){
     }
     else {
 
-        // CHECK IF EMAIL ALREADY EXISTS
-        $check = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
+        // CHECK IF EMAIL ALREADY EXISTS (PREPARED STATEMENT)
+        $stmt = $conn->prepare("SELECT user_id FROM users WHERE email=?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-        if(mysqli_num_rows($check) > 0){
+        if($result->num_rows > 0){
             $message = "Email already exists!";
         }
         else {
 
-            // INSERT USER
-            $insert = mysqli_query($conn,
-            "INSERT INTO users(name,email,password)
-            VALUES('$name','$email','$password')");
+            // HASH PASSWORD
+            $password = md5($password);
 
-            if($insert){
+            // INSERT USER (PREPARED STATEMENT)
+            $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $name, $email, $password);
+
+            if($stmt->execute()){
                 $message = "Registered successfully! You can now login.";
             } else {
                 $message = "Error in registration.";
             }
+
+            $stmt->close();
         }
+
+        $stmt->close();
     }
 }
 
@@ -59,12 +68,13 @@ if(isset($_POST['register'])){
         }
 
         .container{
-            width: 300px;
+            width: 320px;
             margin: 100px auto;
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
             text-align: center;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
         }
 
         input{
@@ -80,10 +90,16 @@ if(isset($_POST['register'])){
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover{
+            background: darkgreen;
         }
 
         .msg{
             color: blue;
+            margin-bottom: 10px;
         }
 
         a{
@@ -106,13 +122,13 @@ if(isset($_POST['register'])){
 
 <form method="POST">
 
-<input type="text" name="name" placeholder="Name" required>
+    <input type="text" name="name" placeholder="Name" required>
 
-<input type="email" name="email" placeholder="Email" required>
+    <input type="email" name="email" placeholder="Email" required>
 
-<input type="password" name="password" placeholder="Password" required>
+    <input type="password" name="password" placeholder="Password" required>
 
-<button type="submit" name="register">Register</button>
+    <button type="submit" name="register">Register</button>
 
 </form>
 
