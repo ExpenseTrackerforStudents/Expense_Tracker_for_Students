@@ -1,12 +1,16 @@
 <?php
 
-// DATABASE CONNECTION SETTINGS
+// ===============================
+// DATABASE CONFIGURATION
+// ===============================
 $host = "localhost";
 $user = "root";
 $pass = "";
 $db   = "expense_tracker";
 
-// CREATE CONNECTION
+// ===============================
+// CREATE DATABASE CONNECTION
+// ===============================
 $conn = mysqli_connect($host, $user, $pass, $db);
 
 // CHECK CONNECTION
@@ -14,8 +18,10 @@ if(!$conn){
     die("Database Connection Failed: " . mysqli_connect_error());
 }
 
-// START SESSION (for login system)
-if(session_status() === PHP_SESSION_NONE){
+// ===============================
+// START SESSION SAFELY
+// ===============================
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
