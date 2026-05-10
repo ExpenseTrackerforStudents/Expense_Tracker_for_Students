@@ -8,6 +8,7 @@ if(!isset($_SESSION['user_id'])){
 }
 
 $user_id = $_SESSION['user_id'];
+
 $error = "";
 $success = "";
 
@@ -19,7 +20,7 @@ if(isset($_POST['save'])){
     $description = trim($_POST['description']);
     $date = trim($_POST['date']);
 
-    // BASIC VALIDATION
+    // VALIDATION
     if(empty($amount) || empty($category_id) || empty($date)){
         $error = "Please fill in all required fields.";
     }
@@ -28,15 +29,21 @@ if(isset($_POST['save'])){
     }
     else {
 
-        // INSERT QUERY
-        $query = "INSERT INTO expenses (user_id, category_id, amount, description, date)
-                  VALUES ('$user_id', '$category_id', '$amount', '$description', '$date')";
+        // PREPARED STATEMENT (SECURE VERSION)
+        $stmt = $conn->prepare("
+            INSERT INTO expenses (user_id, category_id, amount, description, date)
+            VALUES (?, ?, ?, ?, ?)
+        ");
 
-        if(mysqli_query($conn, $query)){
+        $stmt->bind_param("iisss", $user_id, $category_id, $amount, $description, $date);
+
+        if($stmt->execute()){
             $success = "Expense added successfully!";
         } else {
-            $error = "Error: " . mysqli_error($conn);
+            $error = "Error adding expense.";
         }
+
+        $stmt->close();
     }
 }
 ?>
@@ -45,6 +52,7 @@ if(isset($_POST['save'])){
 <html>
 <head>
     <title>Add Expense</title>
+
     <style>
         body{
             font-family: Arial;
@@ -52,11 +60,12 @@ if(isset($_POST['save'])){
         }
 
         .container{
-            width: 400px;
+            width: 420px;
             margin: 50px auto;
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
         }
 
         input, select{
@@ -72,6 +81,11 @@ if(isset($_POST['save'])){
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover{
+            background: darkblue;
         }
 
         .error{
@@ -80,6 +94,11 @@ if(isset($_POST['save'])){
 
         .success{
             color: green;
+        }
+
+        a{
+            display: inline-block;
+            margin-top: 10px;
         }
     </style>
 </head>
