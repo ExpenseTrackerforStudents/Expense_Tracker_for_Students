@@ -9,125 +9,168 @@ if(!isset($_SESSION['user_id'])){
 
 $user_id = $_SESSION['user_id'];
 
-$id = $_GET['id'];
+$error = "";
 
-// GET EXISTING DATA (SAFE VERSION)
-$stmt = $conn->prepare("SELECT * FROM expenses WHERE expense_id=? AND user_id=?");
-$stmt->bind_param("ii", $id, $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-
-if(!$row){
-    echo "Expense not found.";
+// CHECK ID
+if(!isset($_GET['id'])){
+    header("Location: dashboard.php");
     exit();
 }
 
-// UPDATE PROCESS
+$id = $_GET['id'];
+
+/* =========================
+   GET EXISTING EXPENSE
+========================= */
+$stmt = $conn->prepare("
+    SELECT * FROM expenses
+    WHERE expense_id=? AND user_id=?
+");
+
+$stmt->bind_param("ii", $id, $user_id);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+$stmt->close();
+
+// IF NO DATA FOUND
+if(!$row){
+    die("Expense not found.");
+}
+
+/* =========================
+   UPDATE EXPENSE
+========================= */
 if(isset($_POST['update'])){
 
     $amount = trim($_POST['amount']);
-    $description = trim($_POST['description']);
     $category_id = trim($_POST['category_id']);
+    $description = trim($_POST['description']);
     $date = trim($_POST['date']);
 
+    // VALIDATION
     if(empty($amount) || empty($category_id) || empty($date)){
-        echo "Please fill required fields.";
+        $error = "Please fill in all required fields.";
     }
-    else {
+    else if(!is_numeric($amount)){
+        $error = "Amount must be a number.";
+    }
+    else{
 
         $update = $conn->prepare("
             UPDATE expenses
-            SET amount=?, description=?, category_id=?, date=?
+            SET amount=?, category_id=?, description=?, date=?
             WHERE expense_id=? AND user_id=?
         ");
 
         $update->bind_param(
-            "ssissi",
+            "dissii",
             $amount,
-            $description,
             $category_id,
+            $description,
             $date,
             $id,
             $user_id
         );
 
-        $update->execute();
+        if($update->execute()){
+            header("Location: dashboard.php");
+            exit();
+        }
+        else{
+            $error = "Failed to update expense.";
+        }
 
-        header("Location: dashboard.php");
-        exit();
+        $update->close();
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Edit Expense</title>
 
-    <style>
-        body{
-            font-family: Arial;
-            background: #f4f4f4;
-        }
-
-        .container{
-            width: 400px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        input, select{
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-        }
-
-        button{
-            width: 100%;
-            padding: 10px;
-            background: green;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
-
+    <!-- EXTERNAL CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
+<div class="page-center">
 
-<h2>Edit Expense</h2>
+    <div class="form-card">
 
-<form method="POST">
+        <h2>Edit Expense</h2>
 
-    <input type="number" name="amount" value="<?php echo $row['amount']; ?>" required>
-
-    <select name="category_id" required>
-        <option value="">Select Category</option>
-
-        <?php
-        $cat = mysqli_query($conn, "SELECT * FROM categories");
-        while($c = mysqli_fetch_array($cat)){
-        ?>
-            <option value="<?php echo $c['category_id']; ?>"
-                <?php if($c['category_id'] == $row['category_id']) echo "selected"; ?>>
-                <?php echo $c['category_name']; ?>
-            </option>
+        <?php if($error != ""){ ?>
+            <p class="error"><?php echo $error; ?></p>
         <?php } ?>
 
-    </select>
+        <form method="POST">
 
-    <input type="text" name="description" value="<?php echo $row['description']; ?>">
+            <label>Amount</label>
+            <input 
+                type="number"
+                step="0.01"
+                name="amount"
+                value="<?php echo $row['amount']; ?>"
+                required
+            >
 
-    <input type="date" name="date" value="<?php echo $row['date']; ?>" required>
+            <label>Category</label>
+            <select name="category_id" required>
 
-    <button type="submit" name="update">Update</button>
+                <option value="">Select Category</option>
 
-</form>
+                <?php
+                $cat = mysqli_query($conn, "SELECT * FROM categories ORDER BY category_name ASC");
+
+                while($c = mysqli_fetch_array($cat)){
+                ?>
+
+                <option 
+                    value="<?php echo $c['category_id']; ?>"
+                    <?php if($c['category_id'] == $row['category_id']) echo "selected"; ?>
+                >
+                    <?php echo $c['category_name']; ?>
+                </option>
+
+                <?php } ?>
+
+            </select>
+
+            <label>Description</label>
+            <input
+                type="text"
+                name="description"
+                value="<?php echo $row['description']; ?>"
+                placeholder="Enter description"
+            >
+
+            <label>Date</label>
+            <input
+                type="date"
+                name="date"
+                value="<?php echo $row['date']; ?>"
+                required
+            >
+
+            <button type="submit" name="update" class="btn-success">
+                Update Expense
+            </button>
+
+        </form>
+
+        <a href="dashboard.php" class="back-link">
+            ← Back to Dashboard
+        </a>
+
+    </div>
 
 </div>
 
