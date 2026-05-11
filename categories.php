@@ -1,49 +1,91 @@
 <?php include('db.php'); ?>
 
 <?php
+// ========================================
 // CHECK LOGIN
+// ========================================
 if(!isset($_SESSION['user_id'])){
     header("Location: login.php");
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
+$message = "";
 
+// ========================================
 // ADD CATEGORY
+// ========================================
 if(isset($_POST['add'])){
 
     $category = trim($_POST['category']);
 
-    if(!empty($category)){
+    // VALIDATION
+    if(empty($category)){
 
-        // CHECK IF CATEGORY ALREADY EXISTS (PER USER)
-        $check = $conn->prepare("SELECT * FROM categories WHERE category_name=?");
+        $message = "Category name is required.";
+
+    } else {
+
+        // CHECK IF CATEGORY EXISTS
+        $check = $conn->prepare("
+            SELECT category_id
+            FROM categories
+            WHERE category_name=?
+        ");
+
         $check->bind_param("s", $category);
+
         $check->execute();
+
         $result = $check->get_result();
 
-        if($result->num_rows == 0){
+        // CATEGORY ALREADY EXISTS
+        if($result->num_rows > 0){
 
-            // INSERT CATEGORY (PREPARED STATEMENT)
-            $stmt = $conn->prepare("INSERT INTO categories (category_name) VALUES (?)");
+            $message = "Category already exists.";
+
+        } else {
+
+            // INSERT CATEGORY
+            $stmt = $conn->prepare("
+                INSERT INTO categories(category_name)
+                VALUES(?)
+            ");
+
             $stmt->bind_param("s", $category);
-            $stmt->execute();
+
+            if($stmt->execute()){
+
+                $message = "Category added successfully.";
+
+            } else {
+
+                $message = "Failed to add category.";
+            }
+
             $stmt->close();
         }
-    }
 
-    header("Location: categories.php");
-    exit();
+        $check->close();
+    }
 }
 
-// DELETE CATEGORY (SECURE)
+// ========================================
+// DELETE CATEGORY
+// ========================================
 if(isset($_GET['delete'])){
 
     $id = $_GET['delete'];
 
-    $stmt = $conn->prepare("DELETE FROM categories WHERE category_id=?");
+    // DELETE QUERY
+    $stmt = $conn->prepare("
+        DELETE FROM categories
+        WHERE category_id=?
+    ");
+
     $stmt->bind_param("i", $id);
+
     $stmt->execute();
+
     $stmt->close();
 
     header("Location: categories.php");
@@ -52,112 +94,120 @@ if(isset($_GET['delete'])){
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Categories</title>
 
-    <style>
-        body{
-            font-family: Arial;
-            background: #f4f4f4;
-        }
+    <meta charset="UTF-8">
 
-        .container{
-            width: 500px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            margin-top: 50px;
-            border-radius: 10px;
-        }
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
-        input{
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-        }
+    <title>Manage Categories</title>
 
-        button{
-            width: 100%;
-            padding: 10px;
-            background: blue;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+    <!-- STYLE -->
+    <link rel="stylesheet" href="style.css">
 
-        table{
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-
-        th, td{
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-
-        th{
-            background: #333;
-            color: white;
-        }
-
-        a{
-            color: red;
-            text-decoration: none;
-        }
-    </style>
 </head>
 
 <body>
 
 <div class="container">
 
-<h2>Manage Categories</h2>
+    <div class="form-box">
 
-<!-- ADD CATEGORY -->
-<form method="POST">
+        <h2>Manage Categories</h2>
 
-<input type="text" name="category" placeholder="Enter Category Name" required>
+        <!-- MESSAGE -->
+        <?php if($message != ""){ ?>
 
-<button type="submit" name="add">Add Category</button>
+            <p class="success">
+                <?php echo $message; ?>
+            </p>
 
-</form>
+        <?php } ?>
 
-<!-- CATEGORY LIST -->
-<table>
+        <!-- ADD CATEGORY FORM -->
+        <form method="POST">
 
-<tr>
-    <th>ID</th>
-    <th>Category Name</th>
-    <th>Action</th>
-</tr>
+            <input
+                type="text"
+                name="category"
+                placeholder="Enter Category Name"
+                required
+            >
 
-<?php
-$result = mysqli_query($conn, "SELECT * FROM categories");
+            <button
+                type="submit"
+                name="add"
+                class="btn btn-primary"
+            >
+                Add Category
+            </button>
 
-while($row = mysqli_fetch_array($result)){
-?>
+        </form>
 
-<tr>
-    <td><?php echo $row['category_id']; ?></td>
-    <td><?php echo $row['category_name']; ?></td>
-    <td>
-        <a href="categories.php?delete=<?php echo $row['category_id']; ?>"
-        onclick="return confirm('Delete this category?')">
-        Delete
-        </a>
-    </td>
-</tr>
+    </div>
 
-<?php } ?>
+    <!-- CATEGORY TABLE -->
+    <table>
 
-</table>
+        <tr>
 
-<br>
+            <th>ID</th>
+            <th>Category Name</th>
+            <th>Action</th>
 
-<a href="dashboard.php">Back to Dashboard</a>
+        </tr>
+
+        <?php
+
+        $result = mysqli_query(
+            $conn,
+            "SELECT * FROM categories ORDER BY category_name ASC"
+        );
+
+        while($row = mysqli_fetch_array($result)){
+
+        ?>
+
+        <tr>
+
+            <td>
+                <?php echo $row['category_id']; ?>
+            </td>
+
+            <td>
+                <?php echo $row['category_name']; ?>
+            </td>
+
+            <td>
+
+                <a
+                href="categories.php?delete=<?php echo $row['category_id']; ?>"
+                class="btn btn-danger"
+                onclick="return confirm('Delete this category?')">
+
+                    Delete
+
+                </a>
+
+            </td>
+
+        </tr>
+
+        <?php } ?>
+
+    </table>
+
+    <br>
+
+    <a href="dashboard.php"
+    class="btn btn-success">
+
+        ← Back to Dashboard
+
+    </a>
 
 </div>
 

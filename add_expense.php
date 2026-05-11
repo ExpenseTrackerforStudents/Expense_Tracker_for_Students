@@ -1,7 +1,9 @@
 <?php include('db.php'); ?>
 
 <?php
+// ========================================
 // CHECK LOGIN SESSION
+// ========================================
 if(!isset($_SESSION['user_id'])){
     header("Location: login.php");
     exit();
@@ -12,7 +14,9 @@ $user_id = $_SESSION['user_id'];
 $error = "";
 $success = "";
 
+// ========================================
 // HANDLE FORM SUBMISSION
+// ========================================
 if(isset($_POST['save'])){
 
     $amount = trim($_POST['amount']);
@@ -21,26 +25,53 @@ if(isset($_POST['save'])){
     $date = trim($_POST['date']);
 
     // VALIDATION
-    if(empty($amount) || empty($category_id) || empty($date)){
+    if(
+        empty($amount) ||
+        empty($category_id) ||
+        empty($date)
+    ){
+
         $error = "Please fill in all required fields.";
+
     }
-    else if(!is_numeric($amount)){
-        $error = "Amount must be a number.";
+    elseif(!is_numeric($amount)){
+
+        $error = "Amount must be numeric.";
+
     }
     else {
 
-        // PREPARED STATEMENT (SECURE VERSION)
+        // ========================================
+        // INSERT EXPENSE
+        // ========================================
         $stmt = $conn->prepare("
-            INSERT INTO expenses (user_id, category_id, amount, description, date)
+            INSERT INTO expenses
+            (
+                user_id,
+                category_id,
+                amount,
+                description,
+                date
+            )
             VALUES (?, ?, ?, ?, ?)
         ");
 
-        $stmt->bind_param("iisss", $user_id, $category_id, $amount, $description, $date);
+        $stmt->bind_param(
+            "iisss",
+            $user_id,
+            $category_id,
+            $amount,
+            $description,
+            $date
+        );
 
         if($stmt->execute()){
+
             $success = "Expense added successfully!";
+
         } else {
-            $error = "Error adding expense.";
+
+            $error = "Failed to add expense.";
         }
 
         $stmt->close();
@@ -49,103 +80,121 @@ if(isset($_POST['save'])){
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
     <title>Add Expense</title>
 
-    <style>
-        body{
-            font-family: Arial;
-            background: #f4f4f4;
-        }
+    <!-- STYLE -->
+    <link rel="stylesheet" href="style.css">
 
-        .container{
-            width: 420px;
-            margin: 50px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-
-        input, select{
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-        }
-
-        button{
-            width: 100%;
-            padding: 10px;
-            background: blue;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover{
-            background: darkblue;
-        }
-
-        .error{
-            color: red;
-        }
-
-        .success{
-            color: green;
-        }
-
-        a{
-            display: inline-block;
-            margin-top: 10px;
-        }
-    </style>
 </head>
+
 <body>
 
 <div class="container">
 
-<h2>Add Expense</h2>
+    <div class="form-box">
 
-<!-- MESSAGE -->
-<?php if($error != ""){ ?>
-    <p class="error"><?php echo $error; ?></p>
-<?php } ?>
+        <h2>Add Expense</h2>
 
-<?php if($success != ""){ ?>
-    <p class="success"><?php echo $success; ?></p>
-<?php } ?>
+        <!-- ERROR -->
+        <?php if($error != ""){ ?>
 
-<!-- FORM -->
-<form method="POST">
+            <p class="error">
+                <?php echo $error; ?>
+            </p>
 
-    <input type="number" name="amount" placeholder="Amount" required>
-
-    <select name="category_id" required>
-        <option value="">Select Category</option>
-
-        <?php
-        $cat = mysqli_query($conn, "SELECT * FROM categories");
-        while($c = mysqli_fetch_array($cat)){
-        ?>
-            <option value="<?php echo $c['category_id']; ?>">
-                <?php echo $c['category_name']; ?>
-            </option>
         <?php } ?>
 
-    </select>
+        <!-- SUCCESS -->
+        <?php if($success != ""){ ?>
 
-    <input type="text" name="description" placeholder="Description">
+            <p class="success">
+                <?php echo $success; ?>
+            </p>
 
-    <input type="date" name="date" required>
+        <?php } ?>
 
-    <button type="submit" name="save">Save Expense</button>
+        <!-- FORM -->
+        <form method="POST">
 
-</form>
+            <!-- AMOUNT -->
+            <input
+                type="number"
+                step="0.01"
+                name="amount"
+                placeholder="Enter Amount"
+                required
+            >
 
-<br>
-<a href="dashboard.php">← Back to Dashboard</a>
+            <!-- CATEGORY -->
+            <select name="category_id" required>
+
+                <option value="">
+                    Select Category
+                </option>
+
+                <?php
+
+                $cat = mysqli_query(
+                    $conn,
+                    "SELECT * FROM categories"
+                );
+
+                while($c = mysqli_fetch_array($cat)){
+
+                ?>
+
+                <option
+                value="<?php echo $c['category_id']; ?>">
+
+                    <?php echo $c['category_name']; ?>
+
+                </option>
+
+                <?php } ?>
+
+            </select>
+
+            <!-- DESCRIPTION -->
+            <input
+                type="text"
+                name="description"
+                placeholder="Enter Description"
+            >
+
+            <!-- DATE -->
+            <input
+                type="date"
+                name="date"
+                required
+            >
+
+            <!-- BUTTON -->
+            <button
+                type="submit"
+                name="save"
+                class="btn btn-primary"
+            >
+                Save Expense
+            </button>
+
+        </form>
+
+        <br>
+
+        <a href="dashboard.php">
+            ← Back to Dashboard
+        </a>
+
+    </div>
 
 </div>
 
