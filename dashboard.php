@@ -137,7 +137,9 @@ ORDER BY $order
                 <option value="amount_desc">Highest</option>
             </select>
 
-            <button type="submit">Search</button>
+            <button type="submit" class="btn btn-primary">
+    Search
+</button>
 
         </form>
 

@@ -31,7 +31,7 @@ body{
 }
 
 /* =========================
-   DASHBOARD LAYOUT (NEW)
+   DASHBOARD LAYOUT
 ========================= */
 .dashboard{
     display: flex;
@@ -100,7 +100,7 @@ button,
     border: none;
     cursor: pointer;
     border-radius: 10px;
-    color: rgb(13, 0, 255);
+    color: white;
     font-size: 14px;
     font-weight: 500;
     transition: 0.3s ease;
@@ -189,7 +189,7 @@ tr:hover{
 }
 
 /* =========================
-   CARDS (NEW)
+   CARDS
 ========================= */
 .cards{
     display: flex;
@@ -225,7 +225,7 @@ tr:hover{
 .success{ color: #16a34a; }
 
 /* =========================
-   CHART FIX (IMPORTANT)
+   CHART FIX
 ========================= */
 .chart-box{
     width: 100%;
@@ -241,6 +241,44 @@ tr:hover{
 canvas{
     width: 100% !important;
     height: 300px !important;
+}
+
+/* =========================
+   SEARCH + SORT FIX (NEW)
+========================= */
+
+form.search-sort{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+form.search-sort input,
+form.search-sort select{
+    flex: 1;
+    min-width: 180px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    background: white;
+}
+
+form.search-sort button{
+    background: #2563eb;
+    color: white;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+form.search-sort button:hover{
+    background: #1d4ed8;
+    transform: translateY(-2px);
 }
 
 /* =========================
@@ -271,9 +309,8 @@ canvas{
 }
 
 /* =========================
-   MODERN PAGE CENTER (EDIT / LOGIN FIX)
+   PAGE CENTER (EDIT FIX)
 ========================= */
-
 .page-center{
     min-height: 100vh;
     display: flex;
@@ -291,7 +328,7 @@ canvas{
     box-shadow: 0px 10px 25px rgba(0,0,0,0.08);
 }
 
-/* BACK LINK STYLE */
+/* BACK LINK */
 .back-link{
     display: block;
     margin-top: 15px;
@@ -300,20 +337,16 @@ canvas{
     font-weight: 500;
 }
 
-/* =========================
-   CHART RESPONSIVE FIX
-========================= */
-
-.chart-wrapper{
+.search-box{
     display: flex;
-    justify-content: center;
+    gap: 10px;
     align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
-/* =========================
-   SMALL BUTTON FIX (optional polish)
-========================= */
-
-.btn{
-    text-align: center;
+.search-box input,
+.search-box select{
+    flex: 1;
+    min-width: 180px;
 }
