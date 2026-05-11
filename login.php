@@ -16,19 +16,24 @@ if(isset($_POST['login'])){
     $password = trim($_POST['password']);
 
     if(empty($email) || empty($password)){
+
         $error = "Please fill in all fields.";
+
     } else {
 
-        // HASH PASSWORD (same as database storage)
-        $password = md5($password);
+        // HASH PASSWORD
+        $hashedPassword = md5($password);
 
-        // PREPARED STATEMENT (SECURE VERSION)
+        // PREPARED STATEMENT
         $stmt = $conn->prepare("SELECT user_id, name FROM users WHERE email=? AND password=?");
-        $stmt->bind_param("ss", $email, $password);
+
+        $stmt->bind_param("ss", $email, $hashedPassword);
+
         $stmt->execute();
 
         $result = $stmt->get_result();
 
+        // CHECK LOGIN
         if($result->num_rows > 0){
 
             $row = $result->fetch_assoc();
@@ -40,6 +45,7 @@ if(isset($_POST['login'])){
             exit();
 
         } else {
+
             $error = "Invalid Email or Password!";
         }
 
@@ -49,80 +55,60 @@ if(isset($_POST['login'])){
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Login</title>
 
-    <style>
-        body{
-            font-family: Arial;
-            background: #f4f4f4;
-        }
-
-        .container{
-            width: 300px;
-            margin: 100px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-
-        input{
-            width: 90%;
-            padding: 10px;
-            margin: 8px 0;
-        }
-
-        button{
-            width: 100%;
-            padding: 10px;
-            background: blue;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover{
-            background: darkblue;
-        }
-
-        .error{
-            color: red;
-            margin-bottom: 10px;
-        }
-
-        a{
-            display: block;
-            margin-top: 10px;
-        }
-    </style>
+    <!-- EXTERNAL CSS -->
+    <link rel="stylesheet" href="style.css">
 
 </head>
+
 <body>
 
-<div class="container">
+<div class="auth-box">
 
-<h2>Login</h2>
+    <h2>Login</h2>
 
-<!-- ERROR MESSAGE -->
-<?php if($error != ""){ ?>
-    <p class="error"><?php echo $error; ?></p>
-<?php } ?>
+    <!-- ERROR MESSAGE -->
+    <?php if($error != ""){ ?>
+        <p class="error"><?php echo $error; ?></p>
+    <?php } ?>
 
-<form method="POST">
+    <!-- LOGIN FORM -->
+    <form method="POST">
 
-    <input type="email" name="email" placeholder="Email" required>
+        <input 
+            type="email" 
+            name="email" 
+            placeholder="Enter Email"
+            required
+        >
 
-    <input type="password" name="password" placeholder="Password" required>
+        <input 
+            type="password" 
+            name="password" 
+            placeholder="Enter Password"
+            required
+        >
 
-    <button type="submit" name="login">Login</button>
+        <button type="submit" name="login" class="btn-primary">
+            Login
+        </button>
 
-</form>
+    </form>
 
-<a href="register.php">Register Here</a>
+    <p>
+        Don't have an account?
+    </p>
+
+    <a href="register.php">
+        Register Here
+    </a>
 
 </div>
 

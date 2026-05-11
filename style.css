@@ -1,19 +1,23 @@
+/* IMPORT GOOGLE FONT */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* RESET */
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* BODY */
 body{
-    background: #f4f4f4;
-    color: #333;
+    background: #f1f5f9;
+    color: #1e293b;
 }
 
 /* MAIN CONTAINER */
 .container{
-    width: 90%;
+    width: 92%;
     margin: auto;
     padding: 20px;
 }
@@ -21,142 +25,226 @@ body{
 /* HEADINGS */
 h1, h2, h3{
     margin-bottom: 10px;
-    color: #222;
+    color: #0f172a;
 }
 
 /* LINKS */
 a{
     text-decoration: none;
-    color: #007bff;
-}
-
-a:hover{
-    text-decoration: underline;
-}
-
-/* BUTTONS */
-button, .btn{
-    padding: 10px 15px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    color: white;
+    color: #2563eb;
     transition: 0.3s;
 }
 
-button:hover, .btn:hover{
-    opacity: 0.9;
+a:hover{
+    opacity: 0.8;
 }
 
+/* =========================
+   BUTTONS
+========================= */
+
+button,
+.btn{
+    padding: 10px 18px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    color: white;
+    transition: 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+button:hover,
+.btn:hover{
+    transform: translateY(-2px);
+}
+
+/* BUTTON COLORS */
 .btn-primary{
-    background: #007bff;
+    background: #2563eb;
 }
 
 .btn-success{
-    background: #28a745;
+    background: #16a34a;
 }
 
 .btn-danger{
-    background: #dc3545;
+    background: #dc2626;
 }
 
-/* FORM STYLING */
+.edit{
+    background: #16a34a;
+}
+
+.delete{
+    background: #dc2626;
+}
+
+/* =========================
+   FORM DESIGN
+========================= */
+
 form{
     background: white;
-    padding: 20px;
-    border-radius: 10px;
+    padding: 25px;
+    border-radius: 18px;
     margin-bottom: 20px;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.06);
 }
 
-/* INPUT FIELDS */
-input, select{
+/* INPUTS */
+input,
+select{
     width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: 0.3s;
 }
 
-/* TABLE */
+input:focus,
+select:focus{
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0px 0px 5px rgba(37,99,235,0.3);
+}
+
+/* =========================
+   TABLE DESIGN
+========================= */
+
+.table-container{
+    overflow-x: auto;
+}
+
 table{
     width: 100%;
     border-collapse: collapse;
     background: white;
     margin-top: 20px;
-    border-radius: 10px;
+    border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-}
-
-th, td{
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #eee;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.06);
 }
 
 th{
-    background: #333;
+    background: #0f172a;
     color: white;
+    padding: 14px;
+    font-size: 14px;
 }
 
-/* DASHBOARD TOP BOX */
-.top-box{
-    background: white;
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 10px;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-}
-
-/* LOGIN / REGISTER BOX */
-.auth-box{
-    width: 320px;
-    margin: 100px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
+td{
+    padding: 14px;
     text-align: center;
-    box-shadow: 0px 2px 12px rgba(0,0,0,0.2);
+    border-bottom: 1px solid #e2e8f0;
 }
 
-/* ERROR / SUCCESS MESSAGE */
-.error{
-    color: red;
-    margin: 10px 0;
-}
-
-.success{
-    color: green;
-    margin: 10px 0;
+tr:hover{
+    background: #f8fafc;
 }
 
 /* =========================
-   CHART FIX (IMPORTANT UPDATE)
+   DASHBOARD CARD
 ========================= */
 
-/* Chart container fix */
+.top-box{
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+    padding: 25px;
+    margin: 20px 0;
+    border-radius: 18px;
+    box-shadow: 0px 10px 25px rgba(37,99,235,0.25);
+}
+
+.top-box h3{
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+.top-box p{
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* =========================
+   LOGIN / REGISTER CARD
+========================= */
+
+.auth-box{
+    width: 350px;
+    margin: 90px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0px 10px 25px rgba(0,0,0,0.08);
+}
+
+.auth-box h2{
+    margin-bottom: 15px;
+}
+
+/* =========================
+   ALERTS
+========================= */
+
+.error{
+    color: #dc2626;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.success{
+    color: #16a34a;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* =========================
+   CHART DESIGN
+========================= */
+
 .chart-box{
     width: 420px;
-    margin: 20px auto;
+    margin: 25px auto;
     background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.06);
     text-align: center;
 }
 
-/* Force chart size */
+/* CHART SIZE FIX */
 canvas{
     width: 100% !important;
-    height: 300px !important;
-    background: transparent;
+    height: 320px !important;
+}
+
+/* =========================
+   NAVIGATION LINKS
+========================= */
+
+.nav-links{
+    margin-top: 15px;
+}
+
+.nav-links a{
+    margin-right: 10px;
+    color: white;
+    font-weight: 500;
 }
 
 /* =========================
    RESPONSIVE DESIGN
 ========================= */
+
 @media (max-width: 768px){
+
     .container{
         width: 95%;
     }
@@ -165,7 +253,15 @@ canvas{
         width: 100%;
     }
 
-    table, th, td{
+    table{
         font-size: 12px;
+    }
+
+    td, th{
+        padding: 10px;
+    }
+
+    .auth-box{
+        width: 95%;
     }
 }

@@ -17,123 +17,132 @@ if(isset($_POST['register'])){
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    // CHECK EMPTY
+    // CHECK EMPTY FIELDS
     if(empty($name) || empty($email) || empty($password)){
-        $message = "Please fill in all fields.";
-    }
-    else {
 
-        // CHECK EMAIL EXISTS
+        $message = "Please fill in all fields.";
+
+    } else {
+
+        // CHECK IF EMAIL EXISTS
         $stmt = $conn->prepare("SELECT user_id FROM users WHERE email=?");
+
         $stmt->bind_param("s", $email);
+
         $stmt->execute();
+
         $result = $stmt->get_result();
 
+        // EMAIL ALREADY EXISTS
         if($result->num_rows > 0){
+
             $message = "Email already exists!";
-            $stmt->close();
-        }
-        else {
+
+        } else {
 
             // HASH PASSWORD
             $hashedPassword = md5($password);
 
             // INSERT USER
-            $insert = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-            $insert->bind_param("sss", $name, $email, $hashedPassword);
+            $insert = $conn->prepare("
+                INSERT INTO users(name, email, password)
+                VALUES(?, ?, ?)
+            ");
+
+            $insert->bind_param(
+                "sss",
+                $name,
+                $email,
+                $hashedPassword
+            );
 
             if($insert->execute()){
+
                 $message = "Registered successfully! You can now login.";
+
             } else {
-                $message = "Error in registration.";
+
+                $message = "Registration failed!";
             }
 
             $insert->close();
         }
 
-        // CLOSE ONLY ONCE SAFELY
         $stmt->close();
     }
 }
-
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Register</title>
 
-    <style>
-        body{
-            font-family: Arial;
-            background: #f4f4f4;
-        }
-
-        .container{
-            width: 320px;
-            margin: 100px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-
-        input{
-            width: 90%;
-            padding: 10px;
-            margin: 8px 0;
-        }
-
-        button{
-            width: 100%;
-            padding: 10px;
-            background: green;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover{
-            background: darkgreen;
-        }
-
-        .msg{
-            color: blue;
-            margin-bottom: 10px;
-        }
-
-        a{
-            display: block;
-            margin-top: 10px;
-        }
-    </style>
+    <!-- EXTERNAL CSS -->
+    <link rel="stylesheet" href="style.css">
 
 </head>
+
 <body>
 
-<div class="container">
+<div class="auth-box">
 
-<h2>Register</h2>
+    <h2>Create Account</h2>
 
-<?php if($message != ""){ ?>
-    <p class="msg"><?php echo $message; ?></p>
-<?php } ?>
+    <!-- MESSAGE -->
+    <?php if($message != ""){ ?>
 
-<form method="POST">
+        <p class="success">
+            <?php echo $message; ?>
+        </p>
 
-    <input type="text" name="name" placeholder="Name" required>
+    <?php } ?>
 
-    <input type="email" name="email" placeholder="Email" required>
+    <!-- REGISTER FORM -->
+    <form method="POST">
 
-    <input type="password" name="password" placeholder="Password" required>
+        <input
+            type="text"
+            name="name"
+            placeholder="Enter Full Name"
+            required
+        >
 
-    <button type="submit" name="register">Register</button>
+        <input
+            type="email"
+            name="email"
+            placeholder="Enter Email"
+            required
+        >
 
-</form>
+        <input
+            type="password"
+            name="password"
+            placeholder="Enter Password"
+            required
+        >
 
-<a href="login.php">Login Here</a>
+        <button
+            type="submit"
+            name="register"
+            class="btn-success"
+        >
+            Register
+        </button>
+
+    </form>
+
+    <p>
+        Already have an account?
+    </p>
+
+    <a href="login.php">
+        Login Here
+    </a>
 
 </div>
 
